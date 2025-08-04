@@ -1,4 +1,4 @@
-package practice.deploy_practice.global.exception.errorcode;
+package practice.deploy.global.exception.errorcode;
 
 import org.springframework.http.HttpStatus;
 

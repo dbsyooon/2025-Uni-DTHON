@@ -1,9 +1,9 @@
-package practice.deploy_practice.test.exception.errorcode;
+package practice.deploy.test.exception.errorcode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import practice.deploy_practice.global.exception.errorcode.ErrorCode;
+import practice.deploy.global.exception.errorcode.ErrorCode;
 
 @Getter
 @RequiredArgsConstructor

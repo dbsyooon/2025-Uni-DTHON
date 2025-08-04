@@ -1,4 +1,4 @@
-package practice.deploy_practice.global.exception.response;
+package practice.deploy.global.exception.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

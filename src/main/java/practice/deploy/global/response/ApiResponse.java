@@ -1,4 +1,4 @@
-package practice.deploy_practice.global.response;
+package practice.deploy.global.response;
 
 import lombok.Builder;
 

@@ -1,4 +1,4 @@
-package practice.deploy_practice.global.exception.handler;
+package practice.deploy.global.exception.handler;
 
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import practice.deploy_practice.global.exception.errorcode.ErrorCode;
-import practice.deploy_practice.global.exception.errorcode.GlobalErrorCode;
-import practice.deploy_practice.global.exception.response.ErrorResponse;
-import practice.deploy_practice.test.exception.TestException;
+import practice.deploy.global.exception.errorcode.ErrorCode;
+import practice.deploy.global.exception.errorcode.GlobalErrorCode;
+import practice.deploy.global.exception.response.ErrorResponse;
+import practice.deploy.test.exception.TestException;
 
 import java.util.List;
 

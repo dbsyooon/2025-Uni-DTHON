@@ -1,4 +1,4 @@
-package practice.deploy_practice.global.exception.errorcode;
+package practice.deploy.global.exception.errorcode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

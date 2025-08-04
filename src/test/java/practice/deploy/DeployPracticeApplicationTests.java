@@ -1,4 +1,4 @@
-package practice.deploy_practice;
+package practice.deploy;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

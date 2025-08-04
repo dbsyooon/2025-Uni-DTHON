@@ -1,4 +1,4 @@
-package practice.deploy_practice.global.entity;
+package practice.deploy.global.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
