@@ -1,4 +1,4 @@
-package practice.deploy.test.exception.errorcode;
+package practice.deploy.post.exception.errorcode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,9 +7,10 @@ import practice.deploy.global.exception.errorcode.ErrorCode;
 
 @Getter
 @RequiredArgsConstructor
-public enum TestErrorCode implements ErrorCode {
-    TEST_NOT_FOUND(HttpStatus.NOT_FOUND, "테스트 코드를 찾을 수 없습니다."),
+public enum PostErrorCode implements ErrorCode {
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
     ;
+
     private final HttpStatus httpStatus;
     private final String message;
 }

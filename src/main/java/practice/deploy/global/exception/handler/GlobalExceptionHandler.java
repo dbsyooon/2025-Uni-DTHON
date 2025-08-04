@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import practice.deploy.global.exception.errorcode.ErrorCode;
 import practice.deploy.global.exception.errorcode.GlobalErrorCode;
 import practice.deploy.global.exception.response.ErrorResponse;
-import practice.deploy.test.exception.TestException;
+import practice.deploy.post.exception.PostException;
 
 import java.util.List;
 
@@ -32,9 +32,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * handleMemberNotFound(final UserNotFoundException e) { return
      * handleExceptionInternal(e.getErrorCode()); }
      */
-    @ExceptionHandler(TestException.class)
+    @ExceptionHandler(PostException.class)
     public ResponseEntity<Object> handleTestException(
-            final TestException e, HttpServletRequest request) {
+            final PostException e, HttpServletRequest request) {
         logInfo(e.getErrorCode(), e, request);
         return handleExceptionInternal(e.getErrorCode());
     }
