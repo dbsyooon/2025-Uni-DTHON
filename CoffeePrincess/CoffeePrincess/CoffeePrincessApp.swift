@@ -11,7 +11,6 @@ import SwiftUI
 struct CoffeePrincessApp: App {
     @StateObject private var router = AppRouter()
     @StateObject private var container: DIContainer
-    @StateObject private var scheduleService = ScheduleService()
     
     @Environment(\.scenePhase) private var scenePhase
     
@@ -24,12 +23,13 @@ struct CoffeePrincessApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                Index(viewModel: MainViewModel())
+                Index()
                     .environment(\.diContainer, container)
+                    .environmentObject(ScheduleService())
                     .navigationDestination(for: Route.self) { route in
                         switch route {
                         case .home:
-                            MainView()
+                            SurveyView()
                                 .environment(\.diContainer, container)
                                 .navigationBarBackButtonHidden(true)
                         case .scheduleInput:
@@ -47,6 +47,9 @@ struct CoffeePrincessApp: App {
                                 .navigationBarBackButtonHidden(true)
                         case .newReportProfile:
                             NewReportProfileView()
+                                .navigationBarBackButtonHidden(true)
+                        case .survey:
+                            SurveyView()
                                 .navigationBarBackButtonHidden(true)
                         }
                     }

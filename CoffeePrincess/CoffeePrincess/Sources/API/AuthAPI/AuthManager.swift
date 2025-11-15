@@ -16,6 +16,7 @@ final class AuthManager {
     // 개발용 하드코딩 토큰 (Fallback용)
     private let devToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzYzMjQzODE0LCJleHAiOjE3NjMyNjE4MTR9.ur7xwCyULDKbd1sv6hpkRWu7TeA7qY5tpoAC5QIgaWaHxMQGjX1onCHFge_RggbBXcx5Rq3p2hFVfBIYmZ9RCA"
 
+
     private init() {}
 
     /// 현재 액세스 토큰을 반환합니다.
