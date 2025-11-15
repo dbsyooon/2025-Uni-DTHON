@@ -1,15 +1,5 @@
 import SwiftUI
 
-//private extension Color {
-//    static let mainBrown      = Color(red: 106/255, green:  70/255, blue:  22/255) // #6A4616
-//    static let secondaryBrown = Color(red: 139/255, green: 111/255, blue:  71/255) // 살짝 밝은 브라운
-//    static let cardBackground = Color(red: 248/255, green: 242/255, blue: 233/255) // 연한 베이지
-//    static let sectionBackground = Color(red: 252/255, green: 250/255, blue: 247/255)
-//    static let dividerColor   = Color(red: 229/255, green: 216/255, blue: 200/255)
-//}
-
-import SwiftUI
-
 // MARK: - 메인 프로필 화면
 
 struct ProfileView: View {
@@ -40,9 +30,12 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
+                    Button(action: {
+                        dismiss()
+                    })
+                    {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.pretendard(.semiBold, size: 18))
                             .foregroundColor(.mainBrown)
                     }
                 }
@@ -229,7 +222,7 @@ struct SettingRow: View {
                         .font(.pretendard(.medium, size: 15))
                         .foregroundColor(.secondaryBrown)
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.pretendard(.semiBold, size: 12))
                         .foregroundColor(.mainBrown)
                 }
             }
@@ -287,27 +280,19 @@ struct SleepTimeModalView: View {
     @State private var bedtime: String = "23:30"
     @State private var wakeTime: String = "07:30"
 
-    private let timeOptions: [String] = {
-        var options: [String] = []
-        for hour in 0..<24 {
-            for minute in [0, 30] {
-                options.append(String(format: "%02d:%02d", hour, minute))
-            }
-        }
-        return options
-    }()
-
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                timePickerSection(
+                ProfileTimePicker(
                     title: "잠드는 시간",
-                    selection: $bedtime
+                    selection: $bedtime,
+                    profileViewModel: profileViewModel
                 )
 
-                timePickerSection(
+                ProfileTimePicker(
                     title: "일어나는 시간",
-                    selection: $wakeTime
+                    selection: $wakeTime,
+                    profileViewModel: profileViewModel
                 )
 
                 Spacer()
@@ -333,6 +318,7 @@ struct SleepTimeModalView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("닫기") { dismiss() }
+                        .font(.pretendard(.medium, size: 16))
                         .foregroundColor(.mainBrown)
                 }
             }
@@ -342,43 +328,79 @@ struct SleepTimeModalView: View {
             wakeTime = profileViewModel.userInfo.wakeTime.isEmpty ? "07:30" : profileViewModel.userInfo.wakeTime
         }
     }
+}
 
-    private func timePickerSection(
-        title: String,
-        selection: Binding<String>
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+// MARK: - 프로필 시간 선택 휠 피커
+struct ProfileTimePicker: View {
+    let title: String
+    @Binding var selection: String
+    @ObservedObject var profileViewModel: ProfileViewModel
+    
+    @State private var showPicker = false
+    @State private var selectedDate: Date
+    
+    init(title: String, selection: Binding<String>, profileViewModel: ProfileViewModel) {
+        self.title = title
+        self._selection = selection
+        self.profileViewModel = profileViewModel
+        self._selectedDate = State(initialValue: profileViewModel.timeStringToDate(selection.wrappedValue))
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.pretendard(.medium, size: 15))
                 .foregroundColor(.mainBrown)
-
-            Picker(title, selection: selection) {
-                ForEach(timeOptions, id: \.self) { time in
-                    Text(formatTimeDisplay(time)).tag(time)
+            
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showPicker.toggle()
                 }
+            }) {
+                HStack {
+                    Text(profileViewModel.formatTimeDisplay(selection))
+                        .font(.pretendard(.medium, size: 16))
+                        .foregroundColor(.mainBrown)
+                    
+                    Spacer()
+                    
+                    Image(systemName: showPicker ? "chevron.up" : "chevron.down")
+                        .font(.pretendard(.semiBold, size: 14))
+                        .foregroundColor(.mainBrown)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity)
+                .background(Color.sectionBackground)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.dividerCol, lineWidth: 1)
+                )
             }
-            .pickerStyle(.menu)
-            .padding(12)
-            .background(Color.sectionBackground)
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.dividerCol, lineWidth: 1)
-            )
+            
+            if showPicker {
+                DatePicker(
+                    "",
+                    selection: $selectedDate,
+                    displayedComponents: .hourAndMinute
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .tint(.mainBrown)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.cardBackground.opacity(0.5))
+                )
+                .onChange(of: selectedDate) { oldValue, newValue in
+                    selection = profileViewModel.dateToTimeString(newValue)
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
-    }
-
-    private func formatTimeDisplay(_ time: String) -> String {
-        let components = time.split(separator: ":")
-        guard components.count == 2,
-              let hour = Int(components[0]),
-              let minute = Int(components[1]) else {
-            return time
+        .onChange(of: selection) { oldValue, newValue in
+            selectedDate = profileViewModel.timeStringToDate(newValue)
         }
-
-        let hour12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour)
-        let ampm = hour < 12 ? "오전" : "오후"
-        return "\(ampm) \(hour12):\(String(format: "%02d", minute))"
     }
 }
 
@@ -388,9 +410,11 @@ struct TargetSleepModalView: View {
     @ObservedObject var profileViewModel: ProfileViewModel
     @Environment(\.dismiss) var dismiss
 
-    @State private var targetSleep: Double = 7.5
-
-    private let sleepOptions: [Double] = [6, 6.5, 7, 7.5, 8, 8.5, 9]
+    @State private var selectedHours: Int = 7
+    @State private var selectedMinutes: Int = 30
+    
+    private let hourOptions = Array(1...15)
+    private let minuteOptions = [0, 15, 30, 45]
 
     var body: some View {
         NavigationView {
@@ -400,12 +424,39 @@ struct TargetSleepModalView: View {
                         .font(.pretendard(.medium, size: 15))
                         .foregroundColor(.mainBrown)
 
-                    Picker("목표 수면 시간", selection: $targetSleep) {
-                        ForEach(sleepOptions, id: \.self) { hours in
-                            Text(formatSleepOption(hours)).tag(hours)
+                    HStack(spacing: 0) {
+                        // 시간 선택
+                        VStack(spacing: 8) {
+                            Text("시간")
+                                .font(.pretendard(.medium, size: 14))
+                                .foregroundColor(.mainBrown)
+                            
+                            Picker("시간", selection: $selectedHours) {
+                                ForEach(hourOptions, id: \.self) { hour in
+                                    Text("\(hour)").tag(hour)
+                                }
+                            }
+                            .pickerStyle(.wheel)
+                            .tint(.mainBrown)
+                            .frame(maxWidth: .infinity)
+                        }
+                        
+                        // 분 선택
+                        VStack(spacing: 8) {
+                            Text("분")
+                                .font(.pretendard(.medium, size: 14))
+                                .foregroundColor(.mainBrown)
+                            
+                            Picker("분", selection: $selectedMinutes) {
+                                ForEach(minuteOptions, id: \.self) { minute in
+                                    Text("\(minute)").tag(minute)
+                                }
+                            }
+                            .pickerStyle(.wheel)
+                            .tint(.mainBrown)
+                            .frame(maxWidth: .infinity)
                         }
                     }
-                    .pickerStyle(.menu)
                     .padding(12)
                     .background(Color.sectionBackground)
                     .cornerRadius(10)
@@ -418,7 +469,8 @@ struct TargetSleepModalView: View {
                 Spacer()
 
                 Button(action: {
-                    profileViewModel.userInfo.targetSleep = targetSleep
+                    let totalSleep = Double(selectedHours) + Double(selectedMinutes) / 60.0
+                    profileViewModel.userInfo.targetSleep = totalSleep
                     profileViewModel.saveUserInfo()
                     dismiss()
                 }) {
@@ -437,19 +489,18 @@ struct TargetSleepModalView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("닫기") { dismiss() }
+                        .font(.pretendard(.medium, size: 16))
                         .foregroundColor(.mainBrown)
                 }
             }
         }
         .onAppear {
-            targetSleep = profileViewModel.userInfo.targetSleep
+            let currentSleep = profileViewModel.userInfo.targetSleep
+            selectedHours = Int(currentSleep)
+            selectedMinutes = Int((currentSleep - Double(Int(currentSleep))) * 60)
+            // 분을 15분 단위로 반올림
+            selectedMinutes = minuteOptions.min(by: { abs($0 - selectedMinutes) < abs($1 - selectedMinutes) }) ?? 0
         }
-    }
-
-    private func formatSleepOption(_ hours: Double) -> String {
-        let h = Int(hours)
-        let m = Int((hours - Double(h)) * 60)
-        return m == 0 ? "\(h)시간" : "\(h)시간 \(m)분"
     }
 }
 
@@ -470,6 +521,7 @@ struct MaxCaffeineModalView: View {
                         .foregroundColor(.mainBrown)
 
                     TextField("", text: $maxCaffeine)
+                        .font(.pretendard(.medium, size: 16))
                         .keyboardType(.numberPad)
                         .padding(12)
                         .background(Color.sectionBackground)
@@ -504,6 +556,7 @@ struct MaxCaffeineModalView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("닫기") { dismiss() }
+                        .font(.pretendard(.medium, size: 16))
                         .foregroundColor(.mainBrown)
                 }
             }
@@ -519,7 +572,3 @@ struct MaxCaffeineModalView: View {
 #Preview {
     ProfileView(profileViewModel: ProfileViewModel())
 }
-
-
-
-#Preview { ProfileView(profileViewModel: ProfileViewModel()) }
