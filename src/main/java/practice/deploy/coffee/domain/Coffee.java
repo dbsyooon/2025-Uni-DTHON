@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import practice.deploy.user.domain.User;
 
@@ -22,6 +23,9 @@ public class Coffee {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "drink_date")
+    private LocalDate drinkDate;
+
     @Column(name = "drink_time", nullable = false)
     private LocalTime drinkTime;
 
@@ -32,8 +36,9 @@ public class Coffee {
     private Long caffeineAmount;
 
     @Builder
-    public Coffee(User user, LocalTime drinkTime, String name, Long caffeineAmount) {
+    public Coffee(User user, LocalDate drinkDate, LocalTime drinkTime, String name, Long caffeineAmount) {
         this.user = user;
+        this.drinkDate = drinkDate;
         this.drinkTime = drinkTime;
         this.name = name;
         this.caffeineAmount = caffeineAmount;
