@@ -34,6 +34,12 @@ struct CoffeePrincessApp: App {
                         case .scheduleInput:
                             ScheduleView()
                                 .environment(\.diContainer, container)
+                        case .addRecord:
+                            AddRecordView()
+                                .navigationBarBackButtonHidden(true)
+                        case .recordDetail(let menuItem):
+                            RecordDetailView(menuItem: menuItem)
+                                .navigationBarBackButtonHidden(true)
                         }
                     }
             }
