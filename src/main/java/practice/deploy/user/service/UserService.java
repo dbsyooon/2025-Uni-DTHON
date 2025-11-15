@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import practice.deploy.user.domain.User;
 import practice.deploy.user.dto.request.CreateUserInfoRequest;
+import practice.deploy.user.dto.response.UserInfoResponse;
 import practice.deploy.user.exception.UserException;
 import practice.deploy.user.repository.UserRepository;
 
@@ -24,17 +25,18 @@ public class UserService {
         User user = findUserOrThrow(userId);
 
         LocalTime sleepTime = LocalTime.parse(request.sleepTime());
-        LocalTime wakeupTime = LocalTime.parse(request.wakeupTime());
 
         user.insertUserInfo(
                 request.gender(),
                 request.age(),
-                sleepTime,
-                wakeupTime,
-                request.importantPeriod(),
-                request.experience(),
-                request.sensitivityLevel()
+                sleepTime
                 );
+    }
+
+    @Transactional(readOnly = true)
+    public UserInfoResponse getUserInfo(Long userId){
+        User user = findUserOrThrow(userId);
+        return UserInfoResponse.from(user);
     }
 
     private User findUserOrThrow(Long userId){
