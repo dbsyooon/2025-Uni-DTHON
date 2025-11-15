@@ -34,7 +34,7 @@ struct RecordDetailView: View {
                     Stepper(value: $viewModel.shotCount, in: 0...10) {
                         HStack {
                             Image(systemName: "plus.circle")
-                                .foregroundStyle(Color.brown1)
+                                .foregroundStyle(Color.mainBrown)
                             Text("샷 추가")
                             Spacer()
                             Text("\(viewModel.shotCount) 샷")
@@ -49,7 +49,7 @@ struct RecordDetailView: View {
                     }
                     .font(.pretendard(.medium, size: 17))
                     .pickerStyle(.menu)
-                    .tint(Color.brown1)
+                    .tint(Color.mainBrown)
                 }
                 
                 // MARK: - 시간 설정
@@ -62,20 +62,20 @@ struct RecordDetailView: View {
                     )
                     .datePickerStyle(.graphical) // 달력 스타일
                     .labelsHidden()
-                    .tint(Color.brown1)
+                    .tint(Color.mainBrown)
                 }
                 
                 // MARK: - 총 카페인 (계산 결과)
                 Section(header: Text("예상 카페인")) {
                     HStack {
                         Image("activity-heart")
-                            .foregroundStyle(Color.brown1)
+                            .foregroundStyle(Color.mainBrown)
                         Text("총 카페인 함량")
                             .font(.pretendard(.regular, size: 17))
                         Spacer()
                         Text("\(viewModel.totalCaffeine) mg")
                             .font(.pretendard(.bold, size: 19))
-                            .foregroundColor(.brown1)
+                            .foregroundColor(.mainBrown)
                     }
                 }
             }
@@ -89,7 +89,7 @@ struct RecordDetailView: View {
                     .font(.pretendard(.bold, size: 18))
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.brown1)
+                    .background(Color.mainBrown)
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }

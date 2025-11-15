@@ -19,19 +19,19 @@ struct MenuItem: Identifiable, Hashable {
 extension MenuItem {
     /// 아이콘은 SF Symbols를 사용합니다. (https://developer.apple.com/sf-symbols/)
     static var mockStarbucksItems: [MenuItem] = [
-        MenuItem(name: "아메리카노", iconName: "cup.and.saucer.fill", baseCaffeinePerShot: 75),
-        MenuItem(name: "카페라떼", iconName: "cup.and.saucer.fill", baseCaffeinePerShot: 75),
-        MenuItem(name: "헤이즐넛 라떼", iconName: "cup.and.saucer.fill", baseCaffeinePerShot: 75),
-        MenuItem(name: "바닐라 크림 콜드 브루", iconName: "mug.fill", baseCaffeinePerShot: 85),
-        MenuItem(name: "자바 칩 프라푸치노", iconName: "snowflake", baseCaffeinePerShot: 10),
-        MenuItem(name: "유자 민트 티", iconName: "leaf.fill", baseCaffeinePerShot: 5),
-        MenuItem(name: "자몽 허니 블랙 티", iconName: "leaf.fill", baseCaffeinePerShot: 40)
+        MenuItem(name: "아메리카노", iconName: "cup.and.saucer.fill", baseCaffeinePerShot: 150), // 조사 완료
+        MenuItem(name: "카페라떼", iconName: "cup.and.saucer.fill", baseCaffeinePerShot: 75), // 조사 완료
+        MenuItem(name: "바닐라 라떼", iconName: "cup.and.saucer.fill", baseCaffeinePerShot: 75), // 조사 완료
+        MenuItem(name: "콜드 브루", iconName: "mug.fill", baseCaffeinePerShot: 155), // 조사 완료
+        MenuItem(name: "플랫 화이트", iconName: "snowflake", baseCaffeinePerShot: 130), // 조사 완료
+        MenuItem(name: "카페 모카", iconName: "leaf.fill", baseCaffeinePerShot: 95), // 조사 완료
+        MenuItem(name: "돌체 라떼", iconName: "leaf.fill", baseCaffeinePerShot: 150), // 조사 완료
+        MenuItem(name: "자바 칩 프라푸치노", iconName: "leaf.fill", baseCaffeinePerShot: 100) // 조사 완료
     ]
     
     static var mockOtherItems: [MenuItem] = [
-        MenuItem(name: "믹스 커피", iconName: "mug.fill", baseCaffeinePerShot: 60),
-        MenuItem(name: "에너지 드링크", iconName: "bolt.fill", baseCaffeinePerShot: 100),
-        MenuItem(name: "콜라", iconName: "takeoutbag.and.cup.and.straw.fill", baseCaffeinePerShot: 30)
+        MenuItem(name: "믹스 커피", iconName: "mug.fill", baseCaffeinePerShot: 50), // 조사 완료
+        MenuItem(name: "에너지 드링크", iconName: "bolt.fill", baseCaffeinePerShot: 100) // 조사 완료
     ]
 }
 

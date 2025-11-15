@@ -61,7 +61,7 @@ struct MenuItemView: View {
 //                .frame(width: 40)
             Image(systemName: item.iconName)
                 .font(.title3)
-                .foregroundStyle(Color.brown1) // 아이콘 색상
+                .foregroundStyle(Color.mainBrown) // 아이콘 색상
                 .frame(width: 40) // 아이콘 정렬을 위한 프레임
             
             // 이름
