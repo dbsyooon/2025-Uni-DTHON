@@ -50,6 +50,7 @@ public class SecurityConfig {
                                                 "/swagger-ui.html",
                                                 "/v3/api-docs/swagger-config")
                                         .permitAll()
+                                        .requestMatchers("/api/v1/coffee/**","/api/v1/user/**").authenticated()
                                         // 그 외 모든 요청 허용
                                         .anyRequest()
                                         .permitAll())
