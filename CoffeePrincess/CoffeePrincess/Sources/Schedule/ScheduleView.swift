@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ScheduleView: View {
     @Environment(\.diContainer) private var di
+    @EnvironmentObject var scheduleService: ScheduleService  // ✅ 추가
     @StateObject private var viewModel = ScheduleViewModel()
     
     var body: some View {
@@ -53,7 +54,7 @@ struct ScheduleView: View {
                                     .fontWeight(.semibold)
                                     .foregroundColor(.mainBrown)
                                 
-                                TextField("예: 팀 프로젝트 발표", text: $viewModel.title)
+                                TextField("예: 팀 프로젝트 발표", text: $viewModel.name)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 10)
                                     .background(
@@ -105,7 +106,7 @@ struct ScheduleView: View {
                 VStack {
                     Button(action: {
                         let schedule = viewModel.buildSchedule()
-                        di.scheduleService.add(schedule)
+                        scheduleService.add(schedule)
                         di.router.pop()
                     }) {
                         Text("일정 저장")
@@ -115,10 +116,10 @@ struct ScheduleView: View {
                             .padding(.vertical, 14)
                             .background(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .fill(viewModel.title.isEmpty ? Color(.dividerCol) : Color.mainBrown)
+                                    .fill(viewModel.name.isEmpty ? Color(.dividerCol) : Color.mainBrown)
                             )
                     }
-                    .disabled(viewModel.title.isEmpty)
+                    .disabled(viewModel.name.isEmpty)
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 20)
