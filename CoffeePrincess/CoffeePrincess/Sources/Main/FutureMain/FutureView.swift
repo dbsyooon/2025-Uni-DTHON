@@ -18,48 +18,27 @@ struct FutureView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Image(.kongbottom)
+        VStack {
+            VStack(spacing: 16) {
+                scheduleRecommendationSection
+                todayScheduleSection
+            }
+            .padding(.horizontal, 16)
+            
+            Spacer(minLength: 60)
+                
+            Image(.kongbottom)
                     .resizable()
                     .scaledToFit()
                     .frame(height:140)
-                    .offset(y: 250)
                 
-                ScrollView {
-                    VStack(spacing: 16) {
-                        HeaderSection()
-                        
-                        Spacer(minLength: 40)
-                        
-                        scheduleRecommendationSection
-                        todayScheduleSection
-                        
-                        Spacer(minLength: 60)
-                        
-                        //                        Image(.kong)
-                        //                            .resizable()
-                        //                            .scaledToFit()
-                        //                            .frame(height:140)
-                        
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                }
             }
-            .background(Color(.cardBackground))
-            .navigationBarHidden(true)
-        }
+        .background(Color(.cardBackground))
     }
 }
 
 extension FutureView {
     private var scheduleRecommendationSection: some View {
-        ZStack{
-            
-            Index().offset(x: -75, y: -100)
-            
             VStack(alignment: .leading, spacing: 10) {
                 Text("오늘의 일정 기반 추천")
                     .font(.headline)
@@ -107,7 +86,6 @@ extension FutureView {
                     .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
             )
         }
-    }
     
     private var todayScheduleSection: some View {
         

@@ -19,16 +19,10 @@ struct SleepView: View {
     var body: some View {
             VStack {
                 VStack(spacing: 16) {
-                        
-                        HeaderSection()
-                        Spacer()
                         sleepImpactSection
                         caffeineMetabolismSection
-                        
-                        Spacer()
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 12)
                 
                 Spacer(minLength: 60)
 
@@ -51,9 +45,6 @@ extension SleepView{
     
     // 블록 4 - 수면 영향
     private var sleepImpactSection: some View {
-        ZStack{
-            
-            Index().offset(x: -75, y: -70)
             
             VStack(alignment: .leading, spacing: 12) {
                 Text("수면 영향")
@@ -103,7 +94,7 @@ extension SleepView{
                     .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
             )
         }
-    }
+
     
     private var caffeineMetabolismSection: some View {
         VStack(alignment: .leading, spacing: 10) {

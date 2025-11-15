@@ -17,52 +17,29 @@ struct CurrentView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                ScrollView {
-                    VStack(spacing: 16) {
-                        HeaderSection()
+            VStack {
                     
-                        Spacer(minLength: 40)
-                        
+                VStack(spacing: 16) {
                         caffeineStatusSection
                         currentStateSection
                         todayDrinksSection
-                        
-                        Spacer(minLength: 40)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                }
                 
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        addCaffeineButton
-                    }
-                    .padding(.trailing, 24)
-                    .padding(.bottom, 24)
-                }
+                Spacer()
+                
             }
             .background(Color(.cardBackground))
-            .navigationBarHidden(true)
-        }
     }
 }
 
 
 extension CurrentView {
-    
 
-    
     // MARK:  - 블록 1 & 2 - 카페인 지수 + 상태
     
     private var caffeineStatusSection: some View {
-        
-        ZStack{
-            Index().offset(x: -75, y: -100)
-            
+            // 본 섹션 박스
             VStack(alignment: .leading, spacing: 18) {
                 
                 // 상단 상태 요약
@@ -149,14 +126,9 @@ extension CurrentView {
                     .fill(Color(.systemBackground))
                     .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
             )
-            
-            Image(.kong)
-                .resizable()
-                .scaledToFit()
-                .frame(height:75)
-                .offset(x:140, y:-100)
         }
-    }
+
+    
     // MARK: - 블록 3 - 현재 상태 (카페인 %, 에너지, 각성 종료 예상 시간)
     
     private var currentStateSection: some View {

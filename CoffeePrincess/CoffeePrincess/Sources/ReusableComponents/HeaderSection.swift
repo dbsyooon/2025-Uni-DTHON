@@ -43,31 +43,19 @@ struct HeaderSection: View {
                 Spacer()
                 
                 HStack(spacing: 10) {
-                    Button {
-                        // 검색 페이지로 이동 액션 연결 예정
-                    } label: {
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(Color(.white))
-                            .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 2)
-                            .frame(width: 40, height: 40)
-                            .overlay(
-                                Image(systemName: "magnifyingglass")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundColor(.mainBrown)
-                            )
-                    }
                     
                     Button {
                         // 프로필 화면으로 이동 액션 연결 예정
                     } label: {
-                        Image(systemName: "person.crop.circle.fill")
-                            .font(.system(size: 34))
-                            .foregroundColor(.mainBrown)
+                        Image(.fileicon)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 30)
+                            .foregroundColor(.secondaryBrown)
                     }
                 }
             }
             
-            Spacer()
         }
     }
 }
