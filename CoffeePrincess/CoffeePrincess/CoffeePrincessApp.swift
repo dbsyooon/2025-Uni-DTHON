@@ -24,7 +24,8 @@ struct CoffeePrincessApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                ProfileView()
+                Index(viewModel: MainViewModel())
+
                     .environment(\.diContainer, container)
                     .navigationDestination(for: Route.self) { route in
                         switch route {
