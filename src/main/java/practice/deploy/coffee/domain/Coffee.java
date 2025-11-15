@@ -1,6 +1,7 @@
 package practice.deploy.coffee.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +31,7 @@ public class Coffee {
     @Column(name = "caffeine_amount", nullable = false)
     private Long caffeineAmount;
 
+    @Builder
     public Coffee(User user, LocalTime drinkTime, String name, Long caffeineAmount) {
         this.user = user;
         this.drinkTime = drinkTime;
