@@ -23,11 +23,17 @@ struct CoffeePrincessApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                ContentView()
+                AddRecordView()
                     .navigationDestination(for: Route.self) { route in
                         switch route {
                         case .home:
                             let _ = print("로그인뷰나중에구현할게")
+                        case .addRecord:
+                            AddRecordView()
+                                .navigationBarBackButtonHidden(true)
+                        case .recordDetail(let menuItem):
+                            RecordDetailView(menuItem: menuItem)
+                                .navigationBarBackButtonHidden(true)
                         }
                     }
             }

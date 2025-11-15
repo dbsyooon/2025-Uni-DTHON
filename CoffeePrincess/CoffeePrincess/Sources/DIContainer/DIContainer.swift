@@ -15,9 +15,9 @@ final class DIContainer: ObservableObject {
     var router: AppRouter
     
     // MARK: - Services
-    let caffeineService: CaffeineService
-    let healthService: HealthService // 헬스킷 연동 (수면, 심박수)
-    let calendarService: CalendarService // 캘린더 연동 (일정)
+//    let caffeineService: CaffeineService
+//    let healthService: HealthService // 헬스킷 연동 (수면, 심박수)
+//    let calendarService: CalendarService // 캘린더 연동 (일정)
     
     // MARK: - Published Properties
     @Published var selectedTab: String = "홈" // 메인 탭뷰 관찰
@@ -26,9 +26,9 @@ final class DIContainer: ObservableObject {
         self.router = router
         
         // 서비스 초기화 (필요에 따라 Singleton 또는 새 인스턴스)
-        self.caffeineService = CaffeineService.shared // 예시: 싱글톤
-        self.healthService = HealthService()         // 예시: 새 인스턴스
-        self.calendarService = CalendarService()     // 예시: 새 인스턴스
+//        self.caffeineService = CaffeineService.shared // 예시: 싱글톤
+//        self.healthService = HealthService()         // 예시: 새 인스턴스
+//        self.calendarService = CalendarService()     // 예시: 새 인스턴스
     }
 }
 
