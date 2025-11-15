@@ -7,10 +7,11 @@ import SwiftUI
 
 // MARK: - 메인 뷰
 
-struct CaffeineTrackerView: View {
+struct MainView: View {
     
     @StateObject private var viewModel: MainViewModel
     @State private var selectedPeriod: CaffeinePeriod = .week
+    @Environment(\.diContainer) private var di
     
     init(viewModel: MainViewModel = MainViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -58,7 +59,7 @@ struct CaffeineTrackerView: View {
 
 // MARK: - 섹션들
 
-extension CaffeineTrackerView {
+extension MainView {
     
     // 상단 헤더 (오늘 날짜, 검색, 프로필)
     private var headerSection: some View {
@@ -417,7 +418,7 @@ extension CaffeineTrackerView {
 
 // MARK: - 메타볼리즘 / 추천 / 수면 예측 섹션
 
-extension CaffeineTrackerView {
+extension MainView {
     private var caffeineMetabolismSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("카페인 대사")
@@ -561,11 +562,19 @@ extension CaffeineTrackerView {
     }
 }
 
-extension CaffeineTrackerView {
+extension MainView {
     private var scheduleRecommendationSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("오늘의 일정 기반 추천")
                 .font(.headline)
+                    
+            Button {
+                di.router.push(.scheduleInput)
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.title3)
+            }
+            .buttonStyle(.plain)
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -601,7 +610,7 @@ extension CaffeineTrackerView {
     }
 }
 
-extension CaffeineTrackerView {
+extension MainView {
     private var tonightSleepPredictionSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("오늘 밤 수면 예측")
@@ -664,10 +673,10 @@ extension CaffeineTrackerView {
 struct CaffeineTrackerView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            CaffeineTrackerView()
+            MainView()
                 .preferredColorScheme(.light)
             
-            CaffeineTrackerView()
+            MainView()
                 .preferredColorScheme(.dark)
         }
     }

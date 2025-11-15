@@ -23,15 +23,20 @@ struct CoffeePrincessApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                ContentView()
+                MainView()
+                    .environment(\.diContainer, container)
                     .navigationDestination(for: Route.self) { route in
                         switch route {
                         case .home:
-                            let _ = print("로그인뷰나중에구현할게")
+                            MainView()
+                                .environment(\.diContainer, container)
+                        case .scheduleInput:
+                            ScheduleView()
+                                .environment(\.diContainer, container)
                         }
                     }
             }
-            .environmentObject(container)
+            //.environmentObject(container)
             .environment(\.diContainer, container)
             .alert(isPresented: $container.router.showAlert) {
                 Alert(
