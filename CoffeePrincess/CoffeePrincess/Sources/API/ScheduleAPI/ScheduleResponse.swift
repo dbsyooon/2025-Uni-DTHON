@@ -39,3 +39,13 @@ struct ScheduleRecord: Codable {
         case name
     }
 }
+
+
+struct BaseResponse<T: Codable>: Codable {
+    let isSuccess: Bool
+    let code: String
+    let message: String
+    let results: T?
+}
+
+struct EmptyResults: Codable {}

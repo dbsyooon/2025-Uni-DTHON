@@ -25,7 +25,6 @@ struct CoffeePrincessApp: App {
             NavigationStack(path: $router.path) {
                 Index()
                     .environment(\.diContainer, container)
-                    .environmentObject(ScheduleService())
                     .navigationDestination(for: Route.self) { route in
                         switch route {
                         case .home:
