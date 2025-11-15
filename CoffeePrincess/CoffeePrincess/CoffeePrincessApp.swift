@@ -38,7 +38,6 @@ struct CoffeePrincessApp: App {
                     }
             }
             //.environmentObject(container)
-            .environmentObject(scheduleService)
             .environment(\.diContainer, container)
             .alert(isPresented: $container.router.showAlert) {
                 Alert(

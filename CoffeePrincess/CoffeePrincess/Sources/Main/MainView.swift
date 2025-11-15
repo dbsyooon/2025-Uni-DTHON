@@ -678,7 +678,10 @@ struct CaffeineTrackerView_Previews: PreviewProvider {
 
 extension MainView {
     private var todayScheduleSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        
+        let schedules = di.scheduleService.todaySchedules
+        
+        return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("오늘의 일정")
                     .font(.headline)
@@ -692,7 +695,7 @@ extension MainView {
                 .buttonStyle(.plain)
             }
             
-            if scheduleService.todaySchedules.isEmpty {
+            if schedules.isEmpty {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(.systemGray6))
                     .frame(height: 60)
@@ -703,7 +706,7 @@ extension MainView {
                     )
             } else {
                 VStack(alignment: .leading, spacing: 8) {
-                    ForEach(scheduleService.todaySchedules) { schedule in
+                    ForEach(schedules) { schedule in
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(schedule.title)

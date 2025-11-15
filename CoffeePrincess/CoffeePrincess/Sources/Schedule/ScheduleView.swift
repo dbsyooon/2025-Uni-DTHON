@@ -10,9 +10,7 @@ import SwiftUI
 
 struct ScheduleView: View {
     @Environment(\.diContainer) private var di
-    @EnvironmentObject var MainViewModel: MainViewModel
     @StateObject private var viewModel = ScheduleViewModel()
-    @EnvironmentObject var scheduleService: ScheduleService
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -46,7 +44,7 @@ struct ScheduleView: View {
                 Section {
                     Button("저장") {
                         let schedule = viewModel.buildSchedule()
-                        scheduleService.add(schedule)
+                        di.scheduleService.add(schedule)
                         di.router.pop()
                     }
                 }
