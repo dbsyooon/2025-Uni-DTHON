@@ -11,6 +11,8 @@ import Combine
 final class ScheduleViewModel: ObservableObject {
     @Published var name: String = ""
     @Published var time: Date = Date()
+    private let service = ScheduleService()
+    private var cancellables = Set<AnyCancellable>()
     
     /// View에서 입력한 값으로 Schedule 생성
     /// - 지금은 "오늘"만 쓰니까 date는 항상 오늘 날짜("yyyy-MM-dd")로 저장
@@ -33,4 +35,23 @@ final class ScheduleViewModel: ObservableObject {
             time: timeString
         )
     }
+    
+    
+       func saveSchedule() {
+           let schedule = buildSchedule()
+           
+           service.addSchedule(schedule)
+               .receive(on: DispatchQueue.main)
+               .sink { completion in
+                   switch completion {
+                   case .finished:
+                       break
+                   case .failure(let error):
+                       print("일정 저장 실패:", error.localizedDescription)
+                   }
+               } receiveValue: { isSuccess in
+                   print("일정 저장 결과:", isSuccess)
+               }
+               .store(in: &cancellables)
+       }
 }

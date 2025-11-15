@@ -7,7 +7,7 @@ import Foundation
 import Moya
 
 /// 서버에서 내려오는 결과가 `{}` 인 경우용
-struct EmptyResults: Codable {}
+//struct EmptyResults: Codable {}
 
 final class SurveyService {
     
