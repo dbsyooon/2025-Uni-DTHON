@@ -1,10 +1,3 @@
-//
-//  ScheduleService.swift
-//  CoffeePrincess
-//
-//  Created by 김나영 on 11/16/25.
-//
-
 import Foundation
 import Moya
 import Combine
@@ -20,100 +13,88 @@ final class ScheduleService {
     init(provider: MoyaProvider<ScheduleAPI> = MoyaProvider<ScheduleAPI>()) {
         self.provider = provider
     }
+}
+
+// MARK: - Public API
+extension ScheduleService {
     
-    // MARK: - API Methods (with Completion Handler)
-    
-    /// (POST) 일정을 서버에 추가합니다.
-    /// - Parameters:
-    ///   - record: `ScheduleRecord` (보낼 데이터)
-    ///   - completion: `(Result<Void, Error>) -> Void`
-    func addSchedule(_ record: ScheduleRecord, completion: @escaping (Result<Void, Error>) -> Void) {
-        
-        provider.request(.addSchedule(record: record)) { result in
-            switch result {
-            case .success(let response):
-                do {
-                    // 1. (가정) POST 성공 시 "results": {} 를 반환
-                    let apiResponse = try JSONDecoder().decode(APIResponse<EmptyResponse>.self, from: response.data)
-                    
-                    if apiResponse.isSuccess {
-                        completion(.success(())) // 2. 성공 (Void)
-                    } else {
-                        // 3. 서버 비즈니스 에러
-                        let error = NSError(domain: "ScheduleService", code: 0, userInfo: [NSLocalizedDescriptionKey: apiResponse.message])
-                        completion(.failure(error))
-                    }
-                } catch {
-                    completion(.failure(error)) // 4. JSON 디코딩 실패
+    /// (GET) 하루 일정 조회 API
+    /// - Parameter date: "YYYY-MM-DD" 형식의 날짜 문자열 (예: "2025-11-15")
+    /// - Returns: 해당 날짜의 Schedule 리스트를 방출하는 Publisher
+    func fetchSchedules(date: String) -> AnyPublisher<[Schedule], Error> {
+        provider.requestPublisher(.getSchedule(date: date))
+            .map(\.data)
+            .decode(
+                type: BaseResponse<ScheduleListResponse>.self,
+                decoder: JSONDecoder()
+            )
+            .tryMap { baseResponse in
+                // 서버에서 실패로 내려오면 에러 처리
+                guard baseResponse.isSuccess else {
+                    throw ScheduleServiceError.server(message: baseResponse.message)
                 }
                 
-            case .failure(let error):
-                completion(.failure(error)) // 5. 네트워크 실패
-            }
-        }
-    }
-    
-    /// (GET) 특정 날짜의 일정을 조회합니다.
-    /// - Parameters:
-    ///   - date: "YYYY-MM-DD" 형식의 날짜
-    ///   - completion: `(Result<ScheduleListResponse, Error>) -> Void`
-    func getSchedule(date: String, completion: @escaping (Result<ScheduleListResponse, Error>) -> Void) {
-        
-        provider.request(.getSchedule(date: date)) { result in
-            switch result {
-            case .success(let response):
-                do {
-                    // 1. GET 성공 시 "results": { ... } (ScheduleListResponse) 를 반환
-                    let apiResponse = try JSONDecoder().decode(APIResponse<ScheduleListResponse>.self, from: response.data)
-                    
-                    if apiResponse.isSuccess {
-                        completion(.success(apiResponse.results)) // 2. 'results' (ScheduleListResponse) 반환
-                    } else {
-                        // 3. 서버 비즈니스 에러
-                        let error = NSError(domain: "ScheduleService", code: 0, userInfo: [NSLocalizedDescriptionKey: apiResponse.message])
-                        completion(.failure(error))
-                    }
-                } catch {
-                    completion(.failure(error)) // 4. JSON 디코딩 실패
-                }
+                // results가 없으면 빈 배열 리턴
+                let listResponse = baseResponse.results
+                let items = listResponse?.scheduleItemResponseList ?? []
                 
-            case .failure(let error):
-                completion(.failure(error)) // 5. 네트워크 실패
+                // ScheduleItemResponse -> Schedule로 매핑
+                return items.map { item in
+                    // 서버 time: "HH:mm:ss" 인 경우 앞 5자리(HH:mm)만 사용
+                    let timeString: String
+                    if item.time.count >= 5 {
+                        let index = item.time.index(item.time.startIndex, offsetBy: 5)
+                        timeString = String(item.time[..<index])
+                    } else {
+                        timeString = item.time
+                    }
+                    
+                    return Schedule(
+                        name: item.name,
+                        date: item.date,
+                        time: timeString
+                    )
+                }
             }
-        }
+            .eraseToAnyPublisher()
     }
     
-    // MARK: - API Methods (with Combine)
-    
-    /// (POST) Combine을 사용하여 일정을 추가합니다.
-    @available(iOS 13.0, *)
-    func addScheduleWithCombine(_ record: ScheduleRecord) -> AnyPublisher<Void, Error> {
+    /// (POST) 일정 생성 API
+    /// - Parameter schedule: 생성할 일정 도메인 모델
+    /// - Returns: Bool (성공 여부)를 방출하는 Publisher
+    func addSchedule(_ schedule: Schedule) -> AnyPublisher<Bool, Error> {
+        // 도메인 모델 -> 서버에 보낼 Record로 변환
+        let record = ScheduleRecord(
+            time: schedule.time,  // "HH:mm"
+            date: schedule.date,  // "YYYY-MM-DD"
+            name: schedule.name
+        )
+        
         return provider.requestPublisher(.addSchedule(record: record))
             .map(\.data)
-            .decode(type: APIResponse<EmptyResponse>.self, decoder: JSONDecoder())
-            .tryMap { apiResponse -> Void in
-                if apiResponse.isSuccess {
-                    return ()
-                } else {
-                    throw NSError(domain: "ScheduleService", code: 0, userInfo: [NSLocalizedDescriptionKey: apiResponse.message])
+            .decode(
+                type: BaseResponse<EmptyResults>.self,
+                decoder: JSONDecoder()
+            )
+            .tryMap { baseResponse in
+                // 서버에서 실패로 내려오면 에러 처리
+                guard baseResponse.isSuccess else {
+                    throw ScheduleServiceError.server(message: baseResponse.message)
                 }
+                return baseResponse.isSuccess
             }
             .eraseToAnyPublisher()
     }
+}
+
+// MARK: - Error 정의
+enum ScheduleServiceError: LocalizedError {
+    case server(message: String)
     
-    /// (GET) Combine을 사용하여 특정 날짜의 일정을 조회합니다.
-    @available(iOS 13.0, *)
-    func getScheduleWithCombine(date: String) -> AnyPublisher<ScheduleListResponse, Error> {
-        return provider.requestPublisher(.getSchedule(date: date))
-            .map(\.data)
-            .decode(type: APIResponse<ScheduleListResponse>.self, decoder: JSONDecoder())
-            .tryMap { apiResponse -> ScheduleListResponse in
-                if apiResponse.isSuccess {
-                    return apiResponse.results
-                } else {
-                    throw NSError(domain: "ScheduleService", code: 0, userInfo: [NSLocalizedDescriptionKey: apiResponse.message])
-                }
-            }
-            .eraseToAnyPublisher()
+    var errorDescription: String? {
+        switch self {
+        case .server(let message):
+            return message
+        }
     }
 }

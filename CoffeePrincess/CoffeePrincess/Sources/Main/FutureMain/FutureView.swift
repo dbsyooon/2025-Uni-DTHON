@@ -7,13 +7,19 @@
 
 
 import SwiftUI
+import Combine
 
 struct FutureView: View {
     
     @StateObject private var viewModel: FutureViewModel
-    @EnvironmentObject var scheduleService: ScheduleService  // ✅ 추가
     @Environment(\.diContainer) private var di
     
+    // 🔥 이 화면에서 바로 GET해서 쓸 상태
+      @State private var todaySchedules: [Schedule] = []
+      @State private var cancellables = Set<AnyCancellable>()
+      
+      // 이 View 안에서만 쓰는 서비스 인스턴스
+      private let scheduleService = ScheduleService()
     
     init(viewModel: FutureViewModel = FutureViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -38,8 +44,34 @@ struct FutureView: View {
                 
             }
         .background(Color(.cardBackground))
+        .onAppear {
+                fetchTodaySchedules()   // ⬅️ 여기서 GET 한 번
+        }
     }
 }
+
+extension FutureView {
+    
+    /// 오늘 날짜 기준으로 GET 일정 호출
+    private func fetchTodaySchedules() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())   // "2025-11-16" 이런 포맷
+        
+        scheduleService.fetchSchedules(date: today)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                if case let .failure(error) = completion {
+                    print("❌ 일정 GET 실패:", error.localizedDescription)
+                }
+            } receiveValue: { schedules in
+                // 이 화면에서만 쓰는 todaySchedules에 바로 꽂기
+                self.todaySchedules = schedules
+            }
+            .store(in: &cancellables)
+    }
+}
+
 
 extension FutureView {
     private var scheduleRecommendationSection: some View {
@@ -92,86 +124,87 @@ extension FutureView {
         }
     
     private var todayScheduleSection: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                
-                HStack {
-                    Text("오늘의 일정")
-                        .font(.headline)
-                        .foregroundColor(.fontBrown)
-                    Spacer()
-                    Button {
-                        di.router.push(.scheduleInput)
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.subheadline)
-                            Text("추가")
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(Color(.cardBackground))
-                        )
+        VStack(alignment: .leading, spacing: 12) {
+            
+            HStack {
+                Text("오늘의 일정")
+                    .font(.headline)
+                    .foregroundColor(.fontBrown)
+                Spacer()
+                Button {
+                    di.router.push(.scheduleInput)
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.subheadline)
+                        Text("추가")
+                            .font(.caption)
                     }
-                    .buttonStyle(.plain)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(Color(.cardBackground))
+                    )
                 }
-                
-                // ✅ scheduleService 직접 사용
-                if scheduleService.todaySchedules.isEmpty {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(.cardBackground))
-                        .frame(height: 60)
-                        .overlay(
-                            HStack(spacing: 6) {
-                                Image(systemName: "calendar.badge.plus")
-                                    .foregroundColor(.secondary)
-                                Text("등록된 일정이 없습니다")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
-                        )
-                } else {
-                    VStack(spacing: 10) {
-                        ForEach(scheduleService.todaySchedules) { schedule in
-                            HStack(alignment: .top, spacing: 10) {
-                                
-                                VStack {
-                                    Circle()
-                                        .fill(Color.mainBrown)
-                                        .frame(width: 8, height: 8)
-                                    Rectangle()
-                                        .fill(Color(.systemGray4))
-                                        .frame(width: 2)
-                                        .opacity(schedule.id == scheduleService.todaySchedules.last?.id ? 0 : 1)
-                                }
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(schedule.time)
-                                        .font(.caption)
-                                        .foregroundColor(.secondaryBrown)
-                                    
-                                    Text(schedule.name)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.fontBrown)
-                                }
-                                
-                                Spacer()
-                            }
-                        }
-                    }
-                    .padding(.top, 4)
-                }
+                .buttonStyle(.plain)
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
-            )
+            
+            // 🔥 여기서 바로 GET 결과(todaySchedules) 사용
+            if todaySchedules.isEmpty {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.cardBackground))
+                    .frame(height: 60)
+                    .overlay(
+                        HStack(spacing: 6) {
+                            Image(systemName: "calendar.badge.plus")
+                                .foregroundColor(.secondary)
+                            Text("등록된 일정이 없습니다")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    )
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(todaySchedules) { schedule in
+                        HStack(alignment: .top, spacing: 10) {
+                            
+                            VStack {
+                                Circle()
+                                    .fill(Color.mainBrown)
+                                    .frame(width: 8, height: 8)
+                                Rectangle()
+                                    .fill(Color(.systemGray4))
+                                    .frame(width: 2)
+                                    // 마지막 일정이면 선 끊기
+                                    .opacity(schedule.id == todaySchedules.last?.id ? 0 : 1)
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(schedule.time)
+                                    .font(.caption)
+                                    .foregroundColor(.secondaryBrown)
+                                
+                                Text(schedule.name)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.fontBrown)
+                            }
+                            
+                            Spacer()
+                        }
+                    }
+                }
+                .padding(.top, 4)
+            }
         }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
+        )
+    }
 }
 
 #Preview {
