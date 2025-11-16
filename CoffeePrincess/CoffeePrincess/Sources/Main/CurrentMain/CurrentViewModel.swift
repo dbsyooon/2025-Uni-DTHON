@@ -64,24 +64,80 @@ final class CurrentViewModel: ObservableObject {
                 case .success(let response):
                     print("✅ [GET] 커피 목록 로드 성공: \(response.coffeeItemResponseList.count)개")
                     
-                    // ★★★ (중요) API 응답(CoffeeItemResponse)을 UI 모델(Drink)로 변환 ★★★
+                    // 1) UI 모델로 변환
                     self?.todayDrinks = response.coffeeItemResponseList.map { item in
                         Drink(
-                            icon: "☕️", // (API에 아이콘이 없으므로 기본값 사용)
+                            icon: "☕️",
                             name: item.name,
-                            amountMg: item.caffeineAmount, // (CoffeeItemResponse에 추가된 필드)
-                            timeText: String(item.drinkTime.prefix(5)) // "HH:mm:ss" -> "HH:mm"
+                            amountMg: item.caffeineAmount,
+                            timeText: String(item.drinkTime.prefix(5))
                         )
                     }
                     
+                    // 2) ★★★ 마지막 섭취 시간 계산 ★★★
+                    self?.updateLastIntakeTime(response: response)
+                    
                 case .failure(let error):
                     print("❌ [GET] 커피 목록 로드 실패: \(error.localizedDescription)")
-                    self?.todayDrinks = [] // 실패 시 목록 비우기
+                    self?.todayDrinks = []
+                    self?.lastIntakeText = "기록 없음"
                 }
             }
         }
     }
-    
+
+    private func updateLastIntakeTime(response: TodayCoffeeResponse) {
+        // drinkTime = "HH:mm:ss"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        
+        // 1) 오늘 마신 음료 중 가장 최근 시간 찾기
+        let times: [Date] = response.coffeeItemResponseList.compactMap {
+            formatter.date(from: $0.drinkTime)
+        }
+        
+        guard let latestTime = times.max() else {
+            lastIntakeText = "기록 없음"
+            return
+        }
+        
+        // 2) 시각을 오늘 날짜의 실제 시간대로 변환
+        let now = Date()
+        
+        let calendar = Calendar.current
+        let todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: latestTime)
+        
+        let realLatestDate = calendar.date(
+            from: DateComponents(
+                year: todayComponents.year,
+                month: todayComponents.month,
+                day: todayComponents.day,
+                hour: timeComponents.hour,
+                minute: timeComponents.minute,
+                second: timeComponents.second
+            )
+        ) ?? latestTime
+        
+        // 3) 현재 시각과의 차이 계산
+        let diff = now.timeIntervalSince(realLatestDate)
+        
+        if diff < 60 {
+            lastIntakeText = "방금 전"
+            return
+        }
+        
+        let minutes = Int(diff / 60)
+        let hours = minutes / 60
+        
+        if hours > 0 {
+            lastIntakeText = "\(hours)시간 \(minutes % 60)분 전"
+        } else {
+            lastIntakeText = "\(minutes)분 전"
+        }
+    }
+
     /// (GET) ★★★ 대시보드 상태 (카페인, 각성도)를 불러옵니다 ★★★
     func fetchDashboardStatus(container: DIContainer) {
         isLoadingStatus = true
