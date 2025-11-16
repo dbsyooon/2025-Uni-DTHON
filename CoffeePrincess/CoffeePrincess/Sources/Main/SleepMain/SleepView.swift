@@ -87,19 +87,19 @@ extension SleepView{
                     
                     Spacer()
                     
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("수면 방해 확률")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        HStack(spacing: 4) {
-                            Text("\(viewModel.sleepDisruptionPercent)%")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                            ProgressView(value: Double(viewModel.sleepDisruptionPercent), total: 100)
-                                .foregroundColor(.secondaryBrown)
-                                .frame(width: 60)
-                        }
-                    }
+//                    VStack(alignment: .leading, spacing: 4) {
+//                        Text("수면 방해 확률")
+//                            .font(.caption)
+//                            .foregroundColor(.secondary)
+//                        HStack(spacing: 4) {
+//                            Text("\(viewModel.sleepDisruptionPercent)%")
+//                                .font(.subheadline)
+//                                .fontWeight(.bold)
+//                            ProgressView(value: Double(viewModel.sleepDisruptionPercent), total: 100)
+//                                .foregroundColor(.secondaryBrown)
+//                                .frame(width: 60)
+//                        }
+//                    }
                 }
             }
             .padding(16)
@@ -161,27 +161,27 @@ extension SleepView{
                                 }
                                 
                                 // 수면 기준선
-                                Path { path in
-                                    let y = height * 0.55
-                                    path.move(to: CGPoint(x: 0, y: y))
-                                    path.addLine(to: CGPoint(x: width, y: y))
-                                }
-                                .stroke(
-                                    Color.purple.opacity(0.6),
-                                    style: StrokeStyle(lineWidth: 1, dash: [4, 4])
-                                )
-                                
+//                                Path { path in
+//                                    let y = height * 0.55
+//                                    path.move(to: CGPoint(x: 0, y: y))
+//                                    path.addLine(to: CGPoint(x: width, y: y))
+//                                }
+//                                .stroke(
+//                                    Color.purple.opacity(0.6),
+//                                    style: StrokeStyle(lineWidth: 1, dash: [4, 4])
+//                                )
+//                                
                                 let sleepIndex = 8
                                 let spacing: CGFloat = 6
                                 let barWidth = (width - spacing * CGFloat(viewModel.metabolismBars.count - 1)) / CGFloat(viewModel.metabolismBars.count)
                                 let xSleep = CGFloat(sleepIndex) * (barWidth + spacing) + barWidth / 2
-                                
-                                // 수면 시간 세로 라인
-                                Path { path in
-                                    path.move(to: CGPoint(x: xSleep, y: 0))
-                                    path.addLine(to: CGPoint(x: xSleep, y: height))
-                                }
-                                .stroke(Color.purple.opacity(0.8), lineWidth: 1)
+//                                
+//                                // 수면 시간 세로 라인
+//                                Path { path in
+//                                    path.move(to: CGPoint(x: xSleep, y: 0))
+//                                    path.addLine(to: CGPoint(x: xSleep, y: height))
+//                                }
+//                                .stroke(Color.purple.opacity(0.8), lineWidth: 1)
                                 
                                 // 막대들
                                 HStack(alignment: .bottom, spacing: spacing) {
@@ -203,52 +203,52 @@ extension SleepView{
                                         }
                                     }
                                 }
-                                .frame(maxHeight: .infinity, alignment: .bottom)
+                                .frame(/*maxHeight: .infinity, */alignment: .bottom)
                                 
                                 // Now 뱃지
-                                if let nowIndex = viewModel.metabolismBars.firstIndex(where: { $0.isNow }) {
-                                    let spacing: CGFloat = 6
-                                    let barWidth = (width - spacing * CGFloat(viewModel.metabolismBars.count - 1)) / CGFloat(viewModel.metabolismBars.count)
-                                    let xNow = CGFloat(nowIndex) * (barWidth + spacing) + barWidth / 2
-                                    
-                                    VStack(spacing: 2) {
-                                        Text("Now")
-                                            .font(.caption2)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 3)
-                                            .background(
-                                                Capsule()
-                                                    .fill(Color(red: 1.0, green: 0.83, blue: 0.68))
-                                            )
-                                            .foregroundColor(.brown)
-                                        Spacer()
-                                    }
-                                    .frame(width: width, height: height, alignment: .topLeading)
-                                    .offset(x: xNow - width / 2, y: 4)
-                                }
+//                                if let nowIndex = viewModel.metabolismBars.firstIndex(where: { $0.isNow }) {
+//                                    let spacing: CGFloat = 6
+//                                    let barWidth = (width - spacing * CGFloat(viewModel.metabolismBars.count - 1)) / CGFloat(viewModel.metabolismBars.count)
+//                                    let xNow = CGFloat(nowIndex) * (barWidth + spacing) + barWidth / 2
+//                                    
+//                                    VStack(spacing: 2) {
+//                                        Text("Now")
+//                                            .font(.caption2)
+//                                            .padding(.horizontal, 8)
+//                                            .padding(.vertical, 3)
+//                                            .background(
+//                                                Capsule()
+//                                                    .fill(Color(red: 1.0, green: 0.83, blue: 0.68))
+//                                            )
+//                                            .foregroundColor(.brown)
+//                                        Spacer()
+//                                    }
+//                                    .frame(width: width, height: height, alignment: .topLeading)
+//                                    .offset(x: xNow - width / 2, y: 4)
+//                                }
                                 
                                 // 수면 라벨
-                                VStack {
-                                    HStack {
-                                        Spacer()
-                                        VStack(spacing: 2) {
-                                            Text(viewModel.metabolismSleepTimeText)
-                                                .font(.caption2)
-                                                .foregroundColor(.purple)
-                                            Text("Sleep")
-                                                .font(.caption2)
-                                                .foregroundColor(.purple)
-                                        }
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 4)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .fill(Color.purple.opacity(0.1))
-                                        )
-                                    }
-                                    Spacer()
-                                }
-                                .padding(.trailing, 8)
+//                                VStack {
+//                                    HStack {
+//                                        Spacer()
+//                                        VStack(spacing: 2) {
+//                                            Text(viewModel.metabolismSleepTimeText)
+//                                                .font(.caption2)
+//                                                .foregroundColor(.purple)
+//                                            Text("Sleep")
+//                                                .font(.caption2)
+//                                                .foregroundColor(.purple)
+//                                        }
+//                                        .padding(.horizontal, 6)
+//                                        .padding(.vertical, 4)
+//                                        .background(
+//                                            RoundedRectangle(cornerRadius: 10)
+//                                                .fill(Color.purple.opacity(0.1))
+//                                        )
+//                                    }
+//                                    Spacer()
+//                                }
+//                                .padding(.trailing, 8)
                             }
                         }
                         .frame(height: 170)
