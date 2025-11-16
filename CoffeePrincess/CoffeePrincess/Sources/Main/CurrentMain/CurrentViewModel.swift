@@ -37,6 +37,7 @@ final class CurrentViewModel: ObservableObject {
     // MARK: - Init
     init() {
         loadMockData()
+        updateStatus(basedOn: 0)
     }
     
     // MARK: - Today Text
@@ -96,9 +97,11 @@ final class CurrentViewModel: ObservableObject {
                 case .success(let response):
                     print("✅ [GET] 카페인 정보 로드 성공")
                     self?.currentCaffeine = response.currentCaffeine
+                    self?.updateStatus(basedOn: response.currentCaffeine)
                     // (참고: graph 데이터는 response.graph에 있습니다)
                 case .failure(let error):
                     print("❌ [GET] 카페인 정보 로드 실패: \(error.localizedDescription)")
+                    self?.updateStatus(basedOn: 0)
                 }
                 group.leave()
             }
@@ -159,5 +162,22 @@ final class CurrentViewModel: ObservableObject {
             Drink(icon: "☕️", name: "카페라떼", amountMg: 150, timeText: "오후 2:20"),
             Drink(icon: "🥤", name: "콜라", amountMg: 80, timeText: "오후 7:45")
         ]
+    }
+    
+    private func updateStatus(basedOn caffeine: Double) {
+        
+        // (가정) 임계값 설정: 250mg 초과 '높음', 50mg 미만 '낮음'
+        // 이 수치는 A님이 원하는 기준으로 변경하세요.
+        
+        if caffeine > 250 {
+            self.statusIcon = "😱"
+            self.statusText = "높음"
+        } else if caffeine < 50 {
+            self.statusIcon = "😊"
+            self.statusText = "낮음"
+        } else { // 50 ~ 250mg
+            self.statusIcon = "😌"
+            self.statusText = "보통"
+        }
     }
 }

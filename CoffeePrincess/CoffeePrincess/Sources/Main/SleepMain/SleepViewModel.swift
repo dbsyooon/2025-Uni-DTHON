@@ -27,6 +27,13 @@ final class SleepViewModel: ObservableObject {
     
     @Published var isLoadingGraph: Bool = false
     
+    private var dateFomatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+    
     // MARK: - Init
     init() {
         loadMockData()
@@ -71,6 +78,46 @@ final class SleepViewModel: ObservableObject {
                 }
             }
         }
+        let todayString = dateFomatter.string(from: Date())
+        
+        container.coffeeService.getTodayCoffee(date: todayString) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("✅ [GET] (SleepView) 오늘 마신 커피 목록 로드 성공")
+                    
+                    // 마지막 섭취 기록 찾기
+                    if let lastDrink = response.coffeeItemResponseList.last {
+                        // "HH:mm:ss" ➔ "오후 9:50" 형식으로 변환
+                        self?.lastIntakeTimeText = self?.formatLastIntakeTime(lastDrink.drinkTime) ?? "시간 변환 실패"
+                    } else {
+                        self?.lastIntakeTimeText = "오늘 기록 없음"
+                    }
+                    
+                case .failure(let error):
+                    print("❌ [GET] (SleepView) 커피 목록 로드 실패: \(error.localizedDescription)")
+                    self?.lastIntakeTimeText = "로드 실패"
+                }
+            }
+        }
+    }
+    
+    private func formatLastIntakeTime(_ timeString: String) -> String {
+        let formatter = DateFormatter()
+        // (가정) A님의 CurrentViewModel을 보니 timeText가 "HH:mm" 형식입니다.
+        // "HH:mm:ss" 또는 "HH:mm" 형식을 "HH:mm"으로 통일
+        let timeOnly = String(timeString.prefix(5))
+        
+        formatter.dateFormat = "HH:mm"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        
+        guard let date = formatter.date(from: timeOnly) else {
+            return timeOnly // 변환 실패 시 원본("HH:mm") 반환
+        }
+        
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "a h:mm" // "오후 9:50"
+        return formatter.string(from: date)
     }
     
     // MARK: - Mock Data
