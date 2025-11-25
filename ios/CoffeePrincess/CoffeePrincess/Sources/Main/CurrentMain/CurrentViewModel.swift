@@ -1,0 +1,239 @@
+//
+//  CurrentViewModel.swift
+//  CoffeePrincess
+//
+//  Created by chohaeun on 11/16/25.
+//
+
+import Foundation
+
+final class CurrentViewModel: ObservableObject {
+    
+    // MARK: - 대시보드 기본 상태
+    @Published var currentCaffeine: Double = 0
+    @Published var currentAlertnessPercent: Double = 0 // 각성도
+    @Published var energyPercent: Double = 0
+    @Published var statusIcon: String = ""
+    @Published var statusText: String = ""
+    @Published var lastIntakeText: String = ""
+    @Published var awakeEndText: String = ""
+    
+    // MARK: - 오늘 마신 음료
+    
+    @Published var todayDrinks: [Drink] = []
+    
+    @Published var isLoadingTodayDrinks: Bool = false
+    
+    @Published var isLoadingStatus: Bool = false
+    
+    // ★★★ 날짜 포맷을 위한 헬퍼 추가 ★★★
+    private var dateFomatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+    
+    // MARK: - Init
+    init() {
+        loadMockData()
+        updateStatus(basedOn: 0)
+    }
+    
+    // MARK: - Today Text
+    
+    var todayString: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyy.MM.dd (E)"
+        return formatter.string(from: Date())
+    }
+    
+    // MARK: - API Call
+    
+    /// (GET) ★★★ 오늘 마신 커피 목록을 서버에서 불러옵니다 ★★★
+    func fetchTodayCoffee(container: DIContainer) {
+        isLoadingTodayDrinks = true
+        let todayString = dateFomatter.string(from: Date())
+        
+        print("--- 🚀 [GET] 오늘 마신 커피 목록 요청 ---")
+        
+        container.coffeeService.getTodayCoffee(date: todayString) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoadingTodayDrinks = false
+                switch result {
+                case .success(let response):
+                    print("✅ [GET] 커피 목록 로드 성공: \(response.coffeeItemResponseList.count)개")
+                    
+                    // 1) UI 모델로 변환
+                    self?.todayDrinks = response.coffeeItemResponseList.map { item in
+                        Drink(
+                            icon: "☕️",
+                            name: item.name,
+                            amountMg: item.caffeineAmount,
+                            timeText: String(item.drinkTime.prefix(5))
+                        )
+                    }
+                    
+                    // 2) ★★★ 마지막 섭취 시간 계산 ★★★
+                    self?.updateLastIntakeTime(response: response)
+                    
+                case .failure(let error):
+                    print("❌ [GET] 커피 목록 로드 실패: \(error.localizedDescription)")
+                    self?.todayDrinks = []
+                    self?.lastIntakeText = "기록 없음"
+                }
+            }
+        }
+    }
+
+    private func updateLastIntakeTime(response: TodayCoffeeResponse) {
+        // drinkTime = "HH:mm:ss"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        
+        // 1) 오늘 마신 음료 중 가장 최근 시간 찾기
+        let times: [Date] = response.coffeeItemResponseList.compactMap {
+            formatter.date(from: $0.drinkTime)
+        }
+        
+        guard let latestTime = times.max() else {
+            lastIntakeText = "기록 없음"
+            return
+        }
+        
+        // 2) 시각을 오늘 날짜의 실제 시간대로 변환
+        let now = Date()
+        
+        let calendar = Calendar.current
+        let todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: latestTime)
+        
+        let realLatestDate = calendar.date(
+            from: DateComponents(
+                year: todayComponents.year,
+                month: todayComponents.month,
+                day: todayComponents.day,
+                hour: timeComponents.hour,
+                minute: timeComponents.minute,
+                second: timeComponents.second
+            )
+        ) ?? latestTime
+        
+        // 3) 현재 시각과의 차이 계산
+        let diff = now.timeIntervalSince(realLatestDate)
+        
+        if diff < 60 {
+            lastIntakeText = "방금 전"
+            return
+        }
+        
+        let minutes = Int(diff / 60)
+        let hours = minutes / 60
+        
+        if hours > 0 {
+            lastIntakeText = "\(hours)시간 \(minutes % 60)분 전"
+        } else {
+            lastIntakeText = "\(minutes)분 전"
+        }
+    }
+
+    /// (GET) ★★★ 대시보드 상태 (카페인, 각성도)를 불러옵니다 ★★★
+    func fetchDashboardStatus(container: DIContainer) {
+        isLoadingStatus = true
+        
+        let group = DispatchGroup()
+        
+        // --- 1. 카페인 정보 가져오기 ---
+        group.enter()
+        container.dashboardService.getCaffeineInfo { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("✅ [GET] 카페인 정보 로드 성공")
+                    self?.currentCaffeine = response.currentCaffeine
+                    self?.updateStatus(basedOn: response.currentCaffeine)
+                    // (참고: graph 데이터는 response.graph에 있습니다)
+                case .failure(let error):
+                    print("❌ [GET] 카페인 정보 로드 실패: \(error.localizedDescription)")
+                    self?.updateStatus(basedOn: 0)
+                }
+                group.leave()
+            }
+        }
+        
+        // --- 2. 각성 정보 가져오기 ---
+        group.enter()
+        container.dashboardService.getAlertnessInfo { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("✅ [GET] 각성도 정보 로드 성공")
+                    // 서버가 0.23 (비율)로 주므로 100을 곱해 %로 변환
+                    self?.currentAlertnessPercent = response.currentAlertness * 100
+                    // 시간 포맷 변경
+                    self?.awakeEndText = self?.formatAwakeEndTime(response.alertnessEndTime) ?? "정보 없음"
+                case .failure(let error):
+                    print("❌ [GET] 각성도 정보 로드 실패: \(error.localizedDescription)")
+                }
+                group.leave()
+            }
+        }
+        
+        // --- 3. 두 API가 모두 완료되면 로딩 종료 ---
+        group.notify(queue: .main) {
+            self.isLoadingStatus = false
+            print("--- 🏁 대시보드 상태 업데이트 완료 ---")
+        }
+    }
+    
+    /// "YYYY-MM-DD HH:mm:ss" ➔ "오후 11:10"
+    private func formatAwakeEndTime(_ dateString: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        
+        guard let date = formatter.date(from: dateString) else {
+            return dateString // 변환 실패 시 원본 반환
+        }
+        
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "a h:mm" // "오후 11:10"
+        return formatter.string(from: date)
+    }
+    
+    // MARK: - Mock Data
+    private func loadMockData() {
+//        currentCaffeine      = 185.0
+//        currentAlertnessPercent      = 46.0
+        energyPercent        = 78.0
+        statusIcon           = "😌"
+        statusText           = "보통"
+        lastIntakeText       = "1시간 20분 전"
+//        awakeEndText         = "오후 11:10"
+        
+        todayDrinks = [
+            Drink(icon: "☕️", name: "아메리카노", amountMg: 95, timeText: "오전 9:10"),
+            Drink(icon: "☕️", name: "카페라떼", amountMg: 150, timeText: "오후 2:20"),
+            Drink(icon: "🥤", name: "콜라", amountMg: 80, timeText: "오후 7:45")
+        ]
+    }
+    
+    private func updateStatus(basedOn caffeine: Double) {
+        
+        // (가정) 임계값 설정: 250mg 초과 '높음', 50mg 미만 '낮음'
+        // 이 수치는 A님이 원하는 기준으로 변경하세요.
+        
+        if caffeine > 250 {
+            self.statusIcon = "😱"
+            self.statusText = "높음"
+        } else if caffeine < 50 {
+            self.statusIcon = "😊"
+            self.statusText = "낮음"
+        } else { // 50 ~ 250mg
+            self.statusIcon = "😌"
+            self.statusText = "보통"
+        }
+    }
+}
