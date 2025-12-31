@@ -11,16 +11,16 @@ Uni-DTHON 카페인 추적을 통한 일정 관리 서비스
 #### Backend 
 
 - Java / Spring Boot
-- **데이터베이스**: MySQL
-- **보안**: Spring Security + JWT
-- **API**: Swagger
-- **빌드**: Gradle
+- DB: MySQL
+- 보안: Spring Security + JWT
+- API: Swagger
+- 빌드: Gradle
 
 ##### Frontend
 
 - iOS/ Swift/ SwiftUI
-- **네트워킹**: Moya + Combine
-- **아키텍처**: MVVM + DI Container
+- 네트워킹: Moya + Combine
+- 아키텍처: MVVM + DI Container
 
 <br>
 
@@ -171,7 +171,7 @@ Uni-DTHON 카페인 추적을 통한 일정 관리 서비스
 - 공통 엔티티 필드 (생성일시, 수정일시 등)
 
 ---
-
+<br>
 
 #### 1. 앱 진입점
 
@@ -409,6 +409,6 @@ remaining = caffeineAmount × (0.5)^(경과시간/반감기)
 
 # 요약
 
-이 프로젝트는 **카페인 추적 및 맞춤형 분석 서비스**로, 과학적 모델링과 AI를 결합하여 사용자에게 개인화된 카페인 관리 솔루션을 제공합니다. Backend는 Spring Boot 기반의 안정적인 REST API를 제공하고, Frontend는 SwiftUI를 활용한 현대적인 iOS 앱으로 구현되어 있습니다.
+이 프로젝트는 **카페인 추적 및 맞춤형 분석 서비스**로, 과학적 모델링과 AI를 결합하여 사용자에게 개인화된 카페인 관리 솔루션을 제공합니다. Backend는 Spring Boot 기반의 REST API를 제공하고, Frontend는 SwiftUI를 활용한 iOS 앱으로 구현되어 있습니다.
 
 ****
