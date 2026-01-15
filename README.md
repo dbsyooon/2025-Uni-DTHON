@@ -34,7 +34,7 @@
 - AI(Upstage API)를 활용한 개인 맞춤형 피드백 생성
 
 ---
-## Data Flow/System Overview 
+## System Overview 
 
 ```text
 
@@ -109,7 +109,7 @@
 
 ---
 
-## System Overview
+## Summary Flow
 User input → Caffeine tracking → PK/PD modeling →  
 Alertness prediction → Schedule optimization → AI-generated report
 
