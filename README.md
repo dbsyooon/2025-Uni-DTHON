@@ -1,8 +1,11 @@
-# 카페인 추적을 통한 일정 관리 서비스
-Caffeine-Aware Schedule Optimization Platform
+# Caffeine-Aware Schedule Optimization Platform
+카페인 추적을 통한 일정 관리 서비스
 
+<br> 
 
-2025-Uni-DTHON) 이 프로젝트는 **일일 맞춤형 카페인 관리 서비스**로, 카페인 섭취 기록을 기반으로 **각성도, 수면 영향, 일정 효율**을 분석하여 사용자에게 개인화된 카페인 관리 솔루션을 제공합니다.
+2025-Uni-DTHON Project
+
+이 프로젝트는 **일일 맞춤형 카페인 관리 서비스**로, 카페인 섭취 기록을 기반으로 **각성도, 수면 영향, 일정 효율**을 분석하여 사용자에게 개인화된 카페인 관리 솔루션을 제공합니다.
 
 
 ---
@@ -31,6 +34,55 @@ Caffeine-Aware Schedule Optimization Platform
 - AI(Upstage API)를 활용한 개인 맞춤형 피드백 생성
 
 ---
+## Data Flow/System Overview 
+
+```text
+
+┌────────────┐
+│   User     │
+│ (iOS App)  │
+└─────┬──────┘
+      │  Caffeine Intake / Schedule Input
+      ▼
+┌──────────────────┐
+│ Caffeine Tracking│
+│  - Intake Log    │
+│  - Daily Summary │
+└─────┬────────────┘
+      │
+      ▼
+┌──────────────────┐
+│ PK/PD Modeling   │
+│  - Half-life     │
+│  - Blood Level   │
+│  - Tolerance     │
+└─────┬────────────┘
+      │
+      ▼
+┌──────────────────┐
+│ Alertness Engine │
+│  - Alertness %   │
+│  - End Time      │
+└─────┬────────────┘
+      │
+      ▼
+┌──────────────────┐
+│ Schedule Manager │
+│  - Optimization  │
+│  - Time Mapping  │
+└─────┬────────────┘
+      │
+      ▼
+┌──────────────────┐
+│ AI Report Engine │
+│  - 30-Day Data   │
+│  - Upstage API   │
+└──────────────────┘
+
+```
+
+
+---
 
 ## Tech Stack
 ### Backend 
@@ -57,6 +109,9 @@ Caffeine-Aware Schedule Optimization Platform
 
 ---
 
+## System Overview
+User input → Caffeine tracking → PK/PD modeling →  
+Alertness prediction → Schedule optimization → AI-generated report
 
 
 
