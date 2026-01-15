@@ -24,13 +24,13 @@ Caffeine-Aware Schedule Optimization Platform
 ---
 
 ## What Makes This Different
-- **카페인 반감기 + 혈중 농도(PK) + 각성도(PD)**를 결합한 과학적 모델링
-- **사용자 나이 및 내성(tolerance)**을 반영한 개인화 계산
-- 카페인 → 일정 → 수면 → 리포트로 이어지는 **데이터 흐름 중심 설계**
-- 단순 통계가 아닌 **미래 상태(각성 종료 시간) 예측 기반 분석**
+- 카페인 반감기 + 혈중 농도(PK) + 각성도(PD)를 결합한 과학적 모델링
+- 사용자 나이 및 내성(tolerance)을 반영한 개인화 계산
+- 카페인 → 일정 → 수면 → 리포트로 이어지는 데이터 흐름 중심 설계
+- 단순 통계가 아닌 미래 상태(각성 종료 시간) 예측 기반 분석
 - AI(Upstage API)를 활용한 개인 맞춤형 피드백 생성
 
-<br>
+---
 
 ## Tech Stack
 ### Backend 
@@ -52,7 +52,7 @@ Caffeine-Aware Schedule Optimization Platform
   - $Vd = 0.65 \times weight$, $ke = \ln(2) / t_{half}$
   - $C(t)=\frac{F \cdot dose \cdot ka}{Vd \cdot (ka-ke)} \cdot (e^{-ke t}-e^{-ka t})$
 - **각성도(PD, Hill)**:
-  - 농도 기반 Hill 방정식에 **내성(주간 섭취 패턴)** 및 **연령 민감도** 보정 적용
+  - 농도 기반 Hill 방정식에 내성(주간 섭취 패턴) 및 연령 민감도 보정 적용
 - 상세 내용: `docs/algorithms.md`
 
 ---
